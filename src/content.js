@@ -44,7 +44,7 @@ export const CONTENT = {
   stats: [
     { n: "3", label: { th: "ระบบที่ใช้งานจริงบนอินเทอร์เน็ต", en: "Systems live in production" } },
     { n: "2+", label: { th: "ปีในสายวิเคราะห์ข้อมูล", en: "Years in data analytics" } },
-    { n: "18", label: { th: "เครื่องมือใน FileKit ที่เขียนเอง", en: "Tools built in FileKit" } },
+    { n: "54,056", label: { th: "เรื่องร้องเรียนที่วิเคราะห์ในงานล่าสุด", en: "Records analysed in the latest project" } },
     { n: "15.7×", label: { th: "ความเร็วที่ปรับปรุงได้ (วัดจริง)", en: "Measured speed improvement" } },
   ],
 
@@ -75,6 +75,31 @@ export const CONTENT = {
 
   // โครง CARL: Context → Action → Result → Learning (ตามงานวิจัยเรื่อง case study)
   projects: [
+    {
+      id: "bkk-complaints",
+      tag: { th: "วิเคราะห์ข้อมูล · Dashboard", en: "Data analysis · Dashboard" },
+      title: { th: "กรุงเทพฯ ร้องเรียนอะไร แล้วแก้ช้าตรงไหน — วิเคราะห์ข้อมูลเปิด 54,056 เรื่อง",
+               en: "What Bangkok complains about, and where fixes stall — 54,056 open-data records" },
+      impact: { th: "พบว่าเขตที่ช้าที่สุดใช้เวลามากกว่าเขตที่เร็วที่สุด 3.4 เท่า และยิ่งปิดเรื่องช้า คะแนนความพอใจยิ่งลดลงเป็นระบบ",
+                en: "Found a 3.4× gap between the slowest and fastest districts, and that satisfaction drops systematically as resolution time grows" },
+      live: "dashboard/",
+      stack: ["Python", "pandas", "Vega-Lite", "GeoJSON", "Data cleaning", "Open data"],
+      carl: {
+        th: [
+          ["โจทย์", "งานวิเคราะห์ที่ทำในบริษัทเปิดเผยไม่ได้ ผมจึงตั้งโจทย์ใหม่จากข้อมูลเปิดของกรุงเทพมหานคร เพื่อตอบคำถามแบบเดียวกับที่ผู้บริหารถามจริง — ถ้าเพิ่มกำลังคนได้อีกหนึ่งทีม ควรส่งไปที่ไหน"],
+          ["สิ่งที่ทำ", "ดึงข้อมูลเรื่องร้องเรียน 54,068 รายการมาทำความสะอาดด้วย pandas จัดการชื่อเขตที่สะกดไม่ตรงกับแผนที่ราชการ แล้วสร้าง dashboard เล่าเรื่อง 6 ตอนพร้อมแผนที่ 50 เขต ทั้งหมดทำงานในเบราว์เซอร์โดยไม่ต้องใช้เซิร์ฟเวอร์"],
+          ["ผลลัพธ์", "ได้ข้อค้นพบที่ชี้เป้าได้จริง: เขตที่ช้าที่สุดใช้เวลา 149 ชั่วโมงเทียบกับเขตที่เร็วที่สุด 43 ชั่วโมง · งานค้างเกิน 30 วันมี 7,779 เรื่อง · และเรื่องที่ปิดภายในวันเดียวได้ 4.34 ดาว ขณะที่เรื่องที่เกิน 14 วันเหลือ 3.78 ดาว"],
+          ["ได้เรียนรู้", "ค่าเฉลี่ยหลอกได้ง่ายมากกับข้อมูลแบบนี้ — เวลาปิดเรื่องเฉลี่ย 6.9 วัน แต่มัธยฐานจริงคือ 3.7 วัน ถ้าตั้งเป้าหมายจากค่าเฉลี่ยจะได้ภาพที่ผิด และอีกบทเรียนคือแผนที่ราชการสะกด “ราษฏร์บูรณะ” ต่างจากข้อมูลที่ใช้ “ราษฎร์บูรณะ” ทำให้เชื่อมข้อมูลขาดไปหนึ่งเขตโดยไม่มีอะไรฟ้อง"],
+        ],
+        en: [
+          ["Context", "My analytical work at the company cannot be published, so I set the same kind of question against Bangkok's open data — if one more field team became available, where should it go?"],
+          ["Action", "Pulled 54,068 citizen complaint records, cleaned them with pandas, reconciled district names against the official map, and built a six-part narrative dashboard with a 50-district choropleth — all running client-side with no server."],
+          ["Result", "Actionable findings: the slowest district takes 149 hours versus 43 hours for the fastest; 7,779 cases have been open for more than 30 days; and cases closed within a day score 4.34 stars against 3.78 for those past two weeks."],
+          ["Learning", "Averages mislead badly on this shape of data — mean resolution is 6.9 days while the median is 3.7. Targets set from the mean would paint the wrong picture. Also, the official map spells one district differently from the dataset, silently dropping it from the join until I checked the match count."],
+        ],
+      },
+    },
+
     {
       id: "filekit",
       impact: { th: "เร็วขึ้น 15.7 เท่าบนมือถือ · โหลดหน้าแรกลดจาก 831 KB เหลือ 11 KB · ทดสอบอัตโนมัติ 44 เคสผ่าน",

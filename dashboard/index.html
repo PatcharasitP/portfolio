@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>กรุงเทพฯ ร้องเรียนอะไร แก้ช้าตรงไหน — วิเคราะห์ Traffy Fondue</title>
+<meta name="description" content="วิเคราะห์เรื่องร้องเรียน 54,056 เรื่องในกรุงเทพฯ จากข้อมูลเปิด Traffy Fondue — เขตไหนแก้เร็ว ประเภทไหนค้างนาน และความเร็วส่งผลต่อความพอใจแค่ไหน">
+<meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
+<meta property="og:title" content="กรุงเทพฯ ร้องเรียนอะไร แก้ช้าตรงไหน">
+<meta property="og:description" content="วิเคราะห์เรื่องร้องเรียน 54,056 เรื่องจากข้อมูลเปิด Traffy Fondue">
+<meta property="og:image" content="https://patcharasitp.github.io/portfolio/assets/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#fbfbfa; --surface:#fff; --surface-2:#f4f4f2; --line:#e3e3df; --line-soft:#ececeb;
+  --text:#1a1a18; --text-2:#4a4a46; --text-3:#6b6b64;
+  --accent:#1d4ed8; --warn:#c2410c; --ok:#0f7b4f;
+  --radius:14px; --maxw:1000px;
+  --shadow:0 1px 2px rgba(20,20,18,.05), 0 8px 24px rgba(20,20,18,.05);
+  --font:"Sarabun","IBM Plex Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+:root[data-theme="dark"], :root:not([data-theme="light"]) .dm{}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141414; --surface:#1c1c1b; --surface-2:#232322; --line:#33332f; --line-soft:#2a2a28;
+    --text:#e6e6e1; --text-2:#b4b4ad; --text-3:#94948c;
+    --accent:#93b4ff; --warn:#fb923c; --ok:#5ed6a0;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141414; --surface:#1c1c1b; --surface-2:#232322; --line:#33332f; --line-soft:#2a2a28;
+  --text:#e6e6e1; --text-2:#b4b4ad; --text-3:#94948c;
+  --accent:#93b4ff; --warn:#fb923c; --ok:#5ed6a0;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+h1,h2,h3{line-height:1.32;margin:0;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,26px)}
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
+.top .wrap{display:flex;align-items:center;gap:10px;padding:11px clamp(16px,4vw,26px)}
+.back{font-size:13.5px;font-weight:600;color:var(--text-2);text-decoration:none}
+.back:hover{color:var(--text)}
+.top .sp{flex:1}
+.ghost{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+
+header.hero{padding:clamp(34px,6vw,58px) 0 8px}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--text-3);text-transform:uppercase;margin-bottom:13px}
+h1{font-size:clamp(26px,4.6vw,40px);margin-bottom:14px}
+.sub{font-size:clamp(15px,2.2vw,18px);color:var(--text-2);max-width:62ch}
+.src{margin-top:16px;font-size:13px;color:var(--text-3)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:26px 0 10px}
+.kpi{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);padding:16px}
+.kpi b{display:block;font-size:clamp(19px,3vw,25px);letter-spacing:-.02em;line-height:1.25}
+.kpi span{display:block;font-size:11.5px;color:var(--text-3);margin-top:5px;line-height:1.5}
+.kpi small{display:block;font-size:11px;color:var(--text-3);margin-top:3px}
+
+section{padding:clamp(30px,5vw,46px) 0;border-top:1px solid var(--line-soft)}
+.finding{font-family:var(--mono);font-size:11px;letter-spacing:.09em;color:var(--accent);text-transform:uppercase;margin-bottom:9px}
+h2{font-size:clamp(19px,3vw,25px);margin-bottom:11px}
+.lede{color:var(--text-2);max-width:68ch;font-size:16px}
+.chart{margin-top:20px;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);padding:clamp(12px,2.4vw,20px);box-shadow:var(--shadow)}
+/* ‼️ vega-embed ตั้ง display:inline-block ให้กล่องที่มันเข้าไปวาด ซึ่งทำให้ความกว้าง
+   ของกล่องเท่ากับเนื้อหาข้างใน = canvas เอง → width:"container" วัดได้ 0 แล้ววาดออกมากว้าง 0
+   ต้องบังคับให้กล่องเป็น block เต็มความกว้างก่อน vega จึงจะรู้ว่าต้องวาดกว้างเท่าไร */
+.chart > div{display:block!important;width:100%}
+.chart canvas{max-width:100%}
+.chart-skeleton{min-height:260px;display:grid;place-items:center;color:var(--text-3);font-size:13.5px}
+.note{margin-top:13px;font-size:13.5px;color:var(--text-3);line-height:1.7;max-width:70ch}
+.note b{color:var(--text-2)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.method{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius);padding:clamp(16px,3vw,24px)}
+.method h3{font-size:15px;margin-bottom:10px}
+.method ul{margin:0;padding-left:19px;color:var(--text-2);font-size:14.5px}
+.method li{margin-bottom:7px}
+.method code{font-family:var(--mono);font-size:12.5px;background:var(--surface);padding:1px 6px;border-radius:5px;border:1px solid var(--line-soft)}
+footer{padding:26px 0 44px;color:var(--text-3);font-size:13px;text-align:center;border-top:1px solid var(--line-soft)}
+@media (max-width:760px){ .kpis{grid-template-columns:repeat(2,1fr)} .two{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <a class="back" href="../">← กลับหน้าโปรไฟล์</a>
+  <span class="sp"></span>
+  <button class="ghost" id="theme" type="button" aria-label="สลับโหมดสี">☾</button>
+</div></div>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="kicker">DATA ANALYSIS · TRAFFY FONDUE OPEN DATA</p>
+    <h1>กรุงเทพฯ ร้องเรียนอะไร<br>แล้วแก้ช้าตรงไหน</h1>
+    <p class="sub">วิเคราะห์เรื่องร้องเรียนของคนกรุงเทพฯ จากข้อมูลเปิดของ กทม. เพื่อตอบคำถามเดียว —
+      ถ้าจะเพิ่มกำลังคนได้อีกหนึ่งทีม ควรส่งไปเขตไหนและงานประเภทใด</p>
+    <p class="src" id="src"></p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 1</p>
+    <h2>ค่าเฉลี่ยบอกไม่หมด — ครึ่งหนึ่งปิดใน 3.7 วัน แต่หางยาวลากไปเป็นเดือน</h2>
+    <p class="lede">ถ้าดูแค่ค่าเฉลี่ยจะเห็น 6.9 วัน ซึ่งไม่ตรงกับความรู้สึกของทั้งคนแจ้งและคนแก้
+      เพราะการกระจายตัวเบ้ขวาแรงมาก งานส่วนใหญ่จบเร็ว แต่มีกลุ่มที่ค้างยาวจนดึงค่าเฉลี่ยขึ้นไปทั้งชุด</p>
+    <div class="chart"><div id="c-hist" class="chart-skeleton">กำลังเตรียมกราฟ…</div></div>
+    <p class="note" id="n-hist"></p>
+  </section>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 2</p>
+    <h2>เขตที่แก้ช้าที่สุดใช้เวลามากกว่าเขตที่เร็วที่สุดราว 3 เท่า</h2>
+    <p class="lede">แผนที่ระบายสีตามเวลาปิดเรื่อง (มัธยฐาน) ของแต่ละเขต สีเข้ม = ใช้เวลานานกว่า
+      ความต่างระดับนี้ไม่น่าจะอธิบายด้วยจำนวนเรื่องอย่างเดียว จึงเป็นจุดที่ควรเข้าไปดูวิธีทำงานจริง</p>
+    <div class="chart"><div id="c-map" class="chart-skeleton">กำลังเตรียมแผนที่…</div></div>
+    <p class="note" id="n-map"></p>
+  </section>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 3</p>
+    <h2>เขตที่ควรลงไปช่วยก่อน คือเขตที่ทั้งเรื่องเยอะและปิดช้า</h2>
+    <p class="lede">แกนนอนคือจำนวนเรื่อง แกนตั้งคือเวลาปิดเรื่อง เขตที่อยู่มุมขวาบนคือกลุ่มที่กดดันที่สุด
+      ส่วนเขตมุมซ้ายบนเรื่องไม่เยอะแต่ยังช้า ซึ่งมักเป็นปัญหาเรื่องกระบวนการมากกว่ากำลังคน</p>
+    <div class="chart"><div id="c-quad" class="chart-skeleton">กำลังเตรียมกราฟ…</div></div>
+    <p class="note" id="n-quad"></p>
+  </section>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 4</p>
+    <h2>ปัญหาที่แจ้งบ่อย กับปัญหาที่แก้ยาก เป็นคนละกลุ่มกัน</h2>
+    <p class="lede">ขนาดวงกลมคือจำนวนเรื่อง แกนตั้งคือสัดส่วนที่ปิดได้แล้ว แกนนอนคือเวลาที่ใช้
+      งานที่อยู่มุมขวาล่างคือกลุ่มที่ทั้งช้าและค้างเยอะ ซึ่งควรได้รับการออกแบบกระบวนการใหม่มากกว่าการเร่งคน</p>
+    <div class="chart"><div id="c-type" class="chart-skeleton">กำลังเตรียมกราฟ…</div></div>
+    <p class="note" id="n-type"></p>
+  </section>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 5</p>
+    <h2>ยิ่งปิดเรื่องช้า คะแนนความพอใจยิ่งลดลงอย่างเป็นระบบ</h2>
+    <p class="lede">เมื่อจัดกลุ่มตามเวลาที่ใช้แก้แล้วดูคะแนนดาวเฉลี่ย จะเห็นความสัมพันธ์ที่ชัดเจน
+      นี่คือเหตุผลเชิงตัวเลขว่าทำไมการลดเวลาปิดเรื่องจึงคุ้มค่ากว่าการเพิ่มช่องทางรับเรื่อง</p>
+    <div class="chart"><div id="c-star" class="chart-skeleton">กำลังเตรียมกราฟ…</div></div>
+    <p class="note" id="n-star"></p>
+  </section>
+
+  <section>
+    <p class="finding">ข้อค้นพบที่ 6</p>
+    <h2>รับเข้ามากกว่าปิดได้เกือบทุกวัน งานค้างจึงสะสมขึ้นเรื่อย ๆ</h2>
+    <p class="lede">เส้นบนคือเรื่องที่รับเข้าในแต่ละวัน เส้นล่างคือเรื่องที่ปิดได้ ช่องว่างระหว่างสองเส้นคือ
+      งานที่ไหลเข้าไปกองสะสม ถ้าช่องว่างนี้ยังเป็นบวกต่อเนื่อง การเพิ่มคนชั่วคราวจะไม่ช่วยในระยะยาว</p>
+    <div class="chart"><div id="c-daily" class="chart-skeleton">กำลังเตรียมกราฟ…</div></div>
+    <p class="note" id="n-daily"></p>
+  </section>
+
+  <section>
+    <div class="two">
+      <div class="method">
+        <h3>ทำความสะอาดข้อมูลอย่างไร</h3>
+        <ul id="cleaning"></ul>
+      </div>
+      <div class="method">
+        <h3>ตัดสินใจอะไรบ้างระหว่างทาง</h3>
+        <ul>
+          <li>ใช้ <b>มัธยฐาน</b> เป็นตัวหลักแทนค่าเฉลี่ย เพราะการกระจายเบ้ขวาแรง ค่าเฉลี่ยถูกดึงด้วยงานหางยาว</li>
+          <li>คิดอายุงานค้างจาก <b>วันล่าสุดในชุดข้อมูล</b> ไม่ใช่วันที่เปิดดู มิฉะนั้นทุกเรื่องจะดูค้างนานเท่ากันหมด</li>
+          <li>ตัดวันสุดท้ายของชุดข้อมูลออกจากกราฟรายวัน เพราะเก็บมาไม่เต็มวัน จะทำให้ดูเหมือนยอดตก</li>
+          <li>แสดงเฉพาะประเภทปัญหาที่มีอย่างน้อย 200 เรื่อง เพื่อไม่ให้กลุ่มเล็กที่ผันผวนสูงกินพื้นที่การตัดสินใจ</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">ข้อจำกัดที่ควรรู้: ชุดข้อมูลนี้บันทึกเฉพาะเรื่องที่ประชาชนแจ้งผ่านระบบ จึงสะท้อน
+      “การรับรู้และการเข้าถึงระบบ” ด้วย ไม่ใช่ปริมาณปัญหาทั้งหมดที่เกิดขึ้นจริงในพื้นที่ ·
+      เวลาที่ใช้แก้คำนวณจากที่ระบบบันทึกไว้ ไม่รวมกรณีที่ปิดเรื่องโดยยังแก้ไม่เสร็จจริง</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p id="foot"></p>
+</footer>
+
+<script type="module" src="charts.js"></script>
+</body>
+</html>
