@@ -98,9 +98,10 @@ a:hover{text-decoration:underline}
 .hero h1{font-size:clamp(32px,6vw,50px); margin-bottom:16px; line-height:1.18}
 .lead{font-size:clamp(16px,2.4vw,18.5px); color:var(--text-2); max-width:56ch}
 .hero-photo{
-  width:clamp(96px,15vw,150px); aspect-ratio:284/351; flex:none;
-  border-radius:var(--radius); object-fit:cover; border:1px solid var(--line);
-  background:var(--surface-2);
+  width:clamp(104px,14vw,148px); height:auto;   /* height:auto จำเป็น ไม่งั้น attribute height ใน HTML จะทับสัดส่วน */
+  aspect-ratio:284/351; flex:none; align-self:flex-start;
+  border-radius:var(--radius); object-fit:cover; object-position:center top;
+  border:1px solid var(--line); background:var(--surface-2);
 }
 .cta{display:flex; gap:10px; flex-wrap:wrap; margin-top:26px}
 .btn{
@@ -200,7 +201,17 @@ footer{padding:26px 0 40px; text-align:center; color:var(--text-3); font-size:12
 }
 
 @media (max-width:720px){
-  .hero-grid{flex-direction:row-reverse; align-items:center; gap:16px}
+  .hero{padding-top:30px}
+  .hero-grid{flex-direction:column; align-items:flex-start; gap:18px}
+  .hero-photo{
+    width:88px; aspect-ratio:1/1; border-radius:50%;
+    object-position:center 22%;   /* เลื่อนกรอบขึ้นให้ใบหน้าอยู่กลางวงกลมพอดี */
+    order:-1;                     /* ในลำดับ DOM รูปอยู่หลังข้อความ (เพื่อให้เดสก์ท็อปวางขวา)
+                                     บนมือถือจึงต้องดึงขึ้นมาไว้บนสุดด้วย order */
+  }
+  .hero h1{font-size:clamp(28px,8vw,36px)}
+  .cta{width:100%}
+  .cta .btn{flex:1 1 auto; justify-content:center; min-width:132px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .carl dl{grid-template-columns:1fr; gap:3px 0}
   .carl dt{padding-top:10px}
