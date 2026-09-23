@@ -69,14 +69,20 @@ const about = () => {
 
 // การ์ดผลงาน: ผลลัพธ์ต้องอ่านได้ทันทีโดยไม่ต้องกด เพราะงานวิจัยพบว่า recruiter
 // ใช้เวลาสแกนหน้าแรกเพียง 6-7 วินาที ส่วนเคสเต็มพับไว้ให้คนที่สนใจกดอ่านต่อ
+// แถบข้อมูลผลงาน (ช่วงเวลา สถานะ) กับผลลัพธ์เป็นข้อมีเลข ยกแนวคิดจากงานศึกษา Galaxy Portfolio 24/09/2026
+// สถานะคิดจากลิงก์ที่มีจริง ไม่ได้พิมพ์เอง จึงไม่มีทางเขียนว่าใช้งานจริงทั้งที่ไม่มีเว็บ
 function projectCard(p) {
   const ui = C.ui[lang];
+  const status = p.live ? ui.statusLive : ui.statusCode;
   return el("article", { class: "proj reveal" }, [
     el("p", { class: "proj-tag", text: t(p.tag) }),
     el("h3", { text: t(p.title) }),
-    p.impact ? el("p", { class: "impact", text: t(p.impact) }) : null,
+    p.period ? el("p", { class: "proj-meta" }, [el("span", { text: t(p.period) }), el("span", { class: p.live ? "live" : "", text: status })]) : null,
+    p.results ? el("ol", { class: "results" }, t(p.results).map((r) => el("li", { text: r })))
+              : p.impact ? el("p", { class: "impact", text: t(p.impact) }) : null,
     el("div", { class: "proj-links" }, [
-      p.live ? el("a", { class: "chip", href: p.live, target: "_blank", rel: "noopener" }, `↗ ${ui.visit}`) : null,
+      p.live ? el("a", { class: "chip", href: p.live, target: "_blank", rel: "noopener" }, `↗ ${p.live2 ? "FileKit" : ui.visit}`) : null,
+      p.live2 ? el("a", { class: "chip", href: p.live2.href, target: "_blank", rel: "noopener" }, `↗ ${p.live2.label}`) : null,
       p.code ? el("a", { class: "chip", href: p.code, target: "_blank", rel: "noopener" }, `< > ${ui.code}`) : null,
     ]),
     el("div", { class: "stack" }, p.stack.map((s) => el("span", { text: s }))),
@@ -108,7 +114,7 @@ const experience = () =>
         el("div", { class: "item-when", text: t(e.period) }),
         el("div", {}, [
           el("h3", { text: t(e.role) }),
-          el("p", { class: "org", text: `${e.org} · ${t(e.place)}` }),
+          el("p", { class: "org", text: `${e.org}, ${t(e.place)}` }),
           el("ul", {}, t(e.points).map((p) => el("li", { text: p }))),
         ]),
       ])),
@@ -119,7 +125,7 @@ const education = () =>
     secHead(t(C.eduHead)),
     ...C.education.map((e) =>
       el("div", { class: "item reveal" }, [
-        el("div", { class: "item-when", text: e.period }),
+        el("div", { class: "item-when", text: t(e.period) }),
         el("div", {}, [
           el("h3", { text: t(e.degree) }),
           el("p", { class: "org", text: t(e.org) }),
@@ -149,7 +155,7 @@ function render() {
   document.documentElement.lang = lang;
   app.replaceChildren(hero(), about(), projects(), skills(), experience(), education(), contact());
   foot.replaceChildren(
-    el("p", { text: `© ${new Date().getFullYear()} ${C.meta.name} · ${t(C.meta.location)}` })
+    el("p", { text: `© ${new Date().getFullYear()} ${C.meta.name}, ${t(C.meta.location)}` })
   );
   $("#lang").textContent = C.ui[lang].langBtn;
   syncThemeBtn();
