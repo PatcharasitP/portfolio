@@ -158,6 +158,40 @@ a.chip:hover{color:var(--text); border-color:var(--text-3); text-decoration:none
 .results{list-style:none; counter-reset:r; margin:12px 0 0; padding:0; display:grid; gap:8px}
 .results li{counter-increment:r; display:grid; grid-template-columns:30px 1fr; gap:2px; font-size:15px; line-height:1.65; color:var(--text)}
 .results li::before{content:counter(r, decimal-leading-zero); font-family:var(--mono); font-size:12px; color:var(--accent); padding-top:3px}
+/* ภาพเส้นบางประจำผลงาน, ตัวเลขนับขึ้น, จุดใช้งานจริงกระเพื่อม (พี่ปอนด์ให้ทำต่อ 24/09/2026 จากทางเลือก Q2 Q3)
+   ท่าขยับทั้งหมดอยู่ใต้ prefers-reduced-motion: no-preference คนที่ตั้งลดการเคลื่อนไหวเห็นภาพสุดท้ายนิ่ง ๆ */
+.proj{position:relative}
+.proj-art{position:absolute; top:24px; right:24px; width:150px; height:96px; color:var(--text-3); pointer-events:none}
+.proj-art svg{display:block; width:100%; height:100%; overflow:visible}
+.proj-art .ax,.proj-art .win{fill:none; stroke:currentColor; stroke-width:1.2; opacity:.55; stroke-linecap:round; stroke-linejoin:round}
+.proj-art .acc{fill:none; stroke:var(--accent); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.proj-art .dot{fill:var(--accent); opacity:.85}
+.proj-art .bar{fill:var(--accent); fill-opacity:.16; stroke:var(--accent); stroke-width:1.2}
+.proj-art .dup{opacity:.12}
+.proj-art .draw{stroke-dasharray:1; stroke-dashoffset:0}
+.proj.has-art .proj-tag,.proj.has-art h3,.proj.has-art .proj-meta{padding-right:176px}
+.stat b{font-variant-numeric:tabular-nums}
+@media (max-width:720px){ .proj-art{display:none} .proj.has-art .proj-tag,.proj.has-art h3,.proj.has-art .proj-meta{padding-right:0} }
+@media (prefers-reduced-motion: no-preference){
+  .proj-art .dot,.proj-art .file,.proj-art .spin{transform-box:fill-box; transform-origin:center}
+  .proj-art .bar{transform-box:fill-box; transform-origin:50% 100%}
+  .proj-art .dot{animation:artDot 8s ease-out infinite both}
+  .proj-art .draw{animation:artDraw 8s ease-in-out infinite both}
+  .proj-art .file{animation:artFile 8s ease-in-out infinite both}
+  .proj-art .spin{animation:artSpin 8s linear infinite}
+  .proj-art .bar{animation:artBar 8s ease-out infinite both}
+  .proj-art .dup{animation:artDup 8s ease-in-out infinite both}
+  .proj-art .pkt{animation:artPkt 8s ease-in-out infinite both}
+  .proj-meta .live::before{animation:livePulse 2.6s ease-out infinite}
+}
+@keyframes artDot{0%{opacity:0; transform:scale(.4)} 8%{opacity:.85; transform:none} 88%{opacity:.85} 100%{opacity:0}}
+@keyframes artDraw{0%,18%{stroke-dashoffset:1} 42%{stroke-dashoffset:0} 88%{stroke-dashoffset:0; opacity:1} 100%{stroke-dashoffset:0; opacity:0}}
+@keyframes artFile{0%,10%{transform:translate(0,0)} 30%,60%{transform:translate(0,10px)} 80%,100%{transform:translate(0,0)}}
+@keyframes artSpin{to{transform:rotate(360deg)}}
+@keyframes artBar{0%{transform:scaleY(0)} 15%{transform:scaleY(1)} 88%{transform:scaleY(1); opacity:1} 100%{transform:scaleY(1); opacity:0}}
+@keyframes artDup{0%,15%{opacity:.9} 32%,88%{opacity:.12} 100%{opacity:.9}}
+@keyframes artPkt{0%{transform:translateX(0); opacity:0} 6%{opacity:1} 30%{transform:translateX(20px)} 45%{transform:translateX(50px)} 65%{transform:translateX(70px); opacity:1} 80%,100%{transform:translateX(70px); opacity:0}}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(47,158,106,.45)} 70%{box-shadow:0 0 0 7px rgba(47,158,106,0)} 100%{box-shadow:0 0 0 0 rgba(47,158,106,0)}}
 .carl{margin-top:16px; border-top:1px solid var(--line-soft); padding-top:14px}
 .carl > summary{
   cursor:pointer; font-size:13.5px; font-weight:650; color:var(--text-2);

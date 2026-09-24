@@ -4,6 +4,7 @@
 // ข้อความสองภาษาซ้อนกันใน DOM และเพื่อให้โปรแกรมอ่านหน้าจอเห็นภาษาเดียว
 
 import { CONTENT as C } from "./content.js";
+import { artSvg } from "./art.js";
 
 const $ = (s) => document.querySelector(s);
 const app = $("#app"), foot = $("#foot");
@@ -74,7 +75,9 @@ const about = () => {
 function projectCard(p) {
   const ui = C.ui[lang];
   const status = p.live ? ui.statusLive : ui.statusCode;
-  return el("article", { class: "proj reveal" }, [
+  const art = artSvg(p.id);
+  return el("article", { class: art ? "proj reveal has-art" : "proj reveal", "data-id": p.id }, [
+    art ? el("div", { class: "proj-art", html: art }) : null,
     el("p", { class: "proj-tag", text: t(p.tag) }),
     el("h3", { text: t(p.title) }),
     p.period ? el("p", { class: "proj-meta" }, [el("span", { text: t(p.period) }), el("span", { class: p.live ? "live" : "", text: status })]) : null,
@@ -160,6 +163,28 @@ function render() {
   $("#lang").textContent = C.ui[lang].langBtn;
   syncThemeBtn();
   observeReveal();
+  countUp();
+}
+
+// ตัวเลขหัวเว็บนับขึ้นจากศูนย์ครั้งเดียวตอนวาดหน้า แล้วจบที่ข้อความเดิมทุกตัวอักษร
+// คนที่ตั้งลดการเคลื่อนไหวเห็นค่าจริงทันที (24/09/2026)
+function countUp() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".stat b").forEach((b) => {
+    const full = b.textContent, m = full.match(/^([\d,]+)(.*)$/);
+    if (!m) return;
+    const target = +m[1].replace(/,/g, ""), suffix = m[2], comma = m[1].includes(",");
+    const fmt = (v) => (comma ? v.toLocaleString("en-US") : String(v)) + suffix;
+    b.setAttribute("aria-label", full);
+    const t0 = performance.now(), dur = 1100;
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / dur);
+      b.textContent = k < 1 ? fmt(Math.round(target * (1 - Math.pow(1 - k, 3)))) : full;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    b.textContent = fmt(0);
+    requestAnimationFrame(step);
+  });
 }
 
 function syncThemeBtn() {
