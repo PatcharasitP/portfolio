@@ -22,12 +22,24 @@ const themeConfig = () => {
     background: "transparent",
     font: "Sarabun, sans-serif",
     axis: { labelColor: text, titleColor: text, gridColor: grid, domainColor: grid,
-            tickColor: grid, labelFontSize: 12, titleFontSize: 12.5, titleFontWeight: 600 },
+            tickColor: grid, labelFontSize: 12, titleFontSize: 12.5, titleFontWeight: 600,
+            titlePadding: 12 },   // สระบนกับวรรณยุกต์ของชื่อแกนไทยทิ่มขึ้นไปทับป้ายแกน (เห็น 24/09 ที่กราฟดาว "เวลาที่ใช้ปิดเรื่อง")
     legend: { labelColor: text, titleColor: text, labelFontSize: 12, titleFontSize: 12 },
     view: { stroke: null },
     title: { color: text },
   };
 };
+
+// ป้ายชื่อในกราฟ quadrant ใส่เฉพาะเขตที่ข้อความใต้กราฟพูดถึง (รับมากสุด เร็วสุด ช้าสุด และกลุ่มเยอะกับช้า)
+// เดิมใช้เกณฑ์ตัวเลข ชื่อเขตช้า 4 เขตกองทับกันอ่านไม่ออก (เห็น 24/09/2026) เกณฑ์ชุดเดียวกับ fillText
+function quadLabels() {
+  const d = state.districts, m = [...d].filter((x) => x.total >= 300).sort((a, b) => a.median_h - b.median_h);
+  const hs = d.filter((x) => x.total >= 1000 && x.median_h >= 120).sort((a, b) => b.total - a.total).slice(0, 3);
+  const names = [...new Set([[...d].sort((a, b) => b.total - a.total)[0], m[0], m[m.length - 1], ...hs].map((x) => x.district))];
+  // ค่าปกติวางป้ายเหนือจุด สองเขตนี้อยู่ติดเขตวัฒนาจนป้ายชนกัน จึงย้ายข้าง (ข้อมูลชุด ณ 2026-02-25 ถ้าข้อมูลเปลี่ยนต้องดูกราฟใหม่)
+  const SIDE = { "เขตปทุมวัน": "below", "เขตบางกะปิ": "right" };
+  return names.map((name) => ({ name, side: SIDE[name] || "above" }));
+}
 
 const ACCENT = () => (isDark() ? "#93b4ff" : "#1d4ed8");
 const WARN   = () => (isDark() ? "#fb923c" : "#c2410c");
@@ -94,19 +106,15 @@ const specs = {
             { field: "star", title: "ดาวเฉลี่ย", format: ".2f" },
           ],
         } },
-      { mark: { type: "text", fontSize: 11.5, fontWeight: 500, color: isDark() ? "#e6e6e1" : "#1a1a18" },
-        transform: [
-          { filter: "datum.total > 1600 || datum.median_h > 140 || datum.median_h < 48" },
-          { calculate: "datum.total > 2500 ? 'right' : 'left'", as: "al" },
-          { calculate: "datum.total > 2500 ? -11 : 11", as: "ox" },
-        ],
+      ...["above", "below", "right"].map((side) => ({
+        mark: { type: "text", fontSize: 11.5, fontWeight: 500, color: isDark() ? "#e6e6e1" : "#1a1a18",
+                ...{ above: { dy: -15 }, below: { dy: 17 }, right: { align: "left", dx: 13, dy: 4 } }[side] },
+        transform: [{ filter: { field: "district", oneOf: quadLabels().filter((l) => l.side === side).map((l) => l.name) } }],
         encoding: {
           x: { field: "total", type: "quantitative" },
           y: { field: "median_h", type: "quantitative" },
           text: { field: "district" },
-          xOffset: { field: "ox", type: "quantitative" },
-          yOffset: { value: -13 },
-        } },
+        } })),
     ],
   }),
 
@@ -209,10 +217,10 @@ function fillText() {
 
   $("#src").innerHTML =
     `ข้อมูล: <a href="https://data.bangkok.go.th/en/dataset/traffy-fondue" target="_blank" rel="noopener">Traffy Fondue ของกรุงเทพมหานคร</a> ` +
-    `· ช่วง ${s.range[0]} ถึง ${s.range[1]} · ${fmt(s.total)} เรื่อง · วิเคราะห์ด้วย Python (pandas) แสดงผลด้วย Vega-Lite`;
+    `ช่วง ${s.range[0]} ถึง ${s.range[1]} รวม ${fmt(s.total)} เรื่อง วิเคราะห์ด้วย Python (pandas) แสดงผลด้วย Vega-Lite`;
 
   $("#kpis").innerHTML = [
-    [`${fmt(s.total)}`, "เรื่องร้องเรียนที่วิเคราะห์", `${s.districts} เขต · ${s.types} ประเภท`],
+    [`${fmt(s.total)}`, "เรื่องร้องเรียนที่วิเคราะห์", `${s.districts} เขต, ${s.types} ประเภท`],
     [`${s.pct_done}%`, "ปิดเรื่องได้แล้ว", `ยังค้างอีก ${fmt(s.open)} เรื่อง`],
     [`${days(s.median_h)} วัน`, "เวลาปิดเรื่อง (มัธยฐาน)", `ค่าเฉลี่ย ${days(s.mean_h)} วัน`],
     [`${s.star_avg}`, "คะแนนความพอใจเฉลี่ย", `จาก ${fmt(s.star_n)} คนที่ให้คะแนน`],
@@ -223,21 +231,21 @@ function fillText() {
 
   $("#n-hist").innerHTML =
     `<b>ครึ่งหนึ่งของเรื่องปิดได้ภายใน ${days(s.median_h)} วัน</b> แต่ค่าเฉลี่ยอยู่ที่ ${days(s.mean_h)} วัน ` +
-    `เพราะ 10% ที่ช้าที่สุดใช้เวลาเกิน ${days(s.p90_h)} วัน · ` +
+    `เพราะ 10% ที่ช้าที่สุดใช้เวลาเกิน ${days(s.p90_h)} วัน ` +
     `ถ้าตั้งเป้าหมายจากค่าเฉลี่ย ทีมที่ทำงานปกติจะดูเหมือนทำได้ตามเป้าทั้งที่ยังมีงานค้างจริงอยู่มาก`;
 
   $("#n-map").innerHTML =
     `เร็วที่สุดคือ<b>${quick.district}</b> ที่ ${quick.median_h.toFixed(0)} ชั่วโมง ` +
     `ส่วนช้าที่สุดคือ<b>${slow.district}</b> ที่ ${slow.median_h.toFixed(0)} ชั่วโมง ` +
-    `— ต่างกัน ${(slow.median_h / quick.median_h).toFixed(1)} เท่า (นับเฉพาะเขตที่มีอย่างน้อย 300 เรื่อง)`;
+    `ต่างกัน ${(slow.median_h / quick.median_h).toFixed(1)} เท่า (นับเฉพาะเขตที่มีอย่างน้อย 300 เรื่อง)`;
 
   const top = [...d].sort((a, b) => b.total - a.total)[0];
   const heavySlow = [...d].filter((x) => x.total >= 1000 && x.median_h >= 120)
     .sort((a, b) => b.total - a.total).slice(0, 3).map((x) => x.district);
   $("#n-quad").innerHTML =
-    `<b>${top.district}</b> รับเรื่องมากที่สุด ${fmt(top.total)} เรื่อง (ค้าง ${fmt(top.open)}) · ` +
-    (heavySlow.length ? `กลุ่มที่ทั้งเรื่องเยอะและปิดช้าคือ ${heavySlow.join(" · ")} ` : "") +
-    `— เขตกลุ่มนี้คือที่ที่กำลังคนเพิ่มขึ้นหนึ่งทีมน่าจะเห็นผลเร็วที่สุด`;
+    `<b>${top.district}</b> รับเรื่องมากที่สุด ${fmt(top.total)} เรื่อง (ค้าง ${fmt(top.open)}) ` +
+    (heavySlow.length ? `กลุ่มที่ทั้งเรื่องเยอะและปิดช้าคือ ${heavySlow.join(", ")} ` : "") +
+    `เขตกลุ่มนี้คือที่ที่กำลังคนเพิ่มขึ้นหนึ่งทีมน่าจะเห็นผลเร็วที่สุด`;
 
   const slowT = [...t].sort((a, b) => b.median_h - a.median_h)[0];
   const fastT = [...t].sort((a, b) => a.median_h - b.median_h)[0];
@@ -251,7 +259,7 @@ function fillText() {
   const first = st[0], last = st[st.length - 1];
   $("#n-star").innerHTML =
     `เรื่องที่ปิดได้ ${first.bucket} ได้คะแนนเฉลี่ย ${first.star} ดาว ส่วนเรื่องที่ใช้เวลา${last.bucket} ` +
-    `เหลือ ${last.star} ดาว — ต่างกัน ${(first.star - last.star).toFixed(2)} ดาว ` +
+    `เหลือ ${last.star} ดาว ต่างกัน ${(first.star - last.star).toFixed(2)} ดาว ` +
     `<b>ความเร็วในการปิดเรื่องจึงเป็นตัวแปรที่จับต้องได้ที่สุดต่อความพอใจ</b>`;
 
   const inSum = state.daily.reduce((a, x) => a + x.received, 0);
@@ -260,17 +268,17 @@ function fillText() {
   $("#n-daily").innerHTML =
     `ในช่วงที่วิเคราะห์ รับเข้า ${fmt(inSum)} เรื่อง ปิดได้ ${fmt(outSum)} เรื่อง ` +
     `และมี ${gapDays} วันจาก ${state.daily.length} วันที่รับเข้ามากกว่าปิดได้ ` +
-    `· งานค้างที่เกิน 30 วันตอนนี้อยู่ที่ ${fmt(s.open_over_30d)} เรื่อง`;
+    `งานค้างที่เกิน 30 วันตอนนี้อยู่ที่ ${fmt(s.open_over_30d)} เรื่อง`;
 
   $("#cleaning").innerHTML = [
-    ...(s.cleaning || []).map((c) => `<li>ตัดออก <code>${fmt(c.rows)}</code> แถว — ${c.why}</li>`),
+    ...(s.cleaning || []).map((c) => `<li>ตัดออก <code>${fmt(c.rows)}</code> แถว เพราะ${c.why}</li>`),
     `<li>แก้ชื่อเขตให้ตรงกับแผนที่ราชการ (ข้อมูลสะกด “ราษฎร์บูรณะ” แต่แผนที่ใช้ “ราษฏร์บูรณะ”) จึงจับคู่ได้ครบ <code>50/50</code> เขต</li>`,
     `<li>ลดจำนวนจุดของขอบเขตแผนที่จาก <code>81,451</code> เหลือ <code>1,375</code> จุด ทำให้ไฟล์เล็กลงจาก 3.2 MB เหลือ 31 KB โดยรูปทรงยังอ่านออกเหมือนเดิม</li>`,
   ].join("");
 
   $("#foot").innerHTML =
-    `จัดทำโดย Patcharasit Pongudom · ข้อมูลเปิดจากกรุงเทพมหานคร (Traffy Fondue) ` +
-    `· ตัวเลขทั้งหมดคำนวณจากชุดข้อมูล ณ ${s.asof}`;
+    `จัดทำโดย Patcharasit Pongudom, ข้อมูลเปิดจากกรุงเทพมหานคร (Traffy Fondue), ` +
+    `ตัวเลขทั้งหมดคำนวณจากชุดข้อมูล ณ ${s.asof}`;
 }
 
 // ── โหลดข้อมูลก่อน แล้วค่อยดึงไลบรารีกราฟเมื่อใกล้ถึงกราฟตัวแรก ───────────

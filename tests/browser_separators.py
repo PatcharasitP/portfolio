@@ -39,9 +39,30 @@ try:
                 for line in s.split("\n"):
                     if any(c in line for c in BAD): fails.append(f"{lang} {where}: {line.strip()[:80]}")
             ctx.close()
+        # หน้าแดชบอร์ด กทม. (ภาษาไทยอย่างเดียว) รอบ refresh 24/09 หลุดไป 18 จุด เพิ่มเข้าเทส 24/09/2026 สาย
+        ctx = b.new_context(viewport={"width": 1280, "height": 900})
+        pg = ctx.new_page(); pg.goto(base + "dashboard/", wait_until="networkidle")
+        pg.wait_for_function("document.querySelector('#n-map') && document.querySelector('#n-map').innerText.length > 20", timeout=15000)
+        texts = {
+            "แดชบอร์ด จอ": pg.evaluate("document.body.innerText"),
+            "แดชบอร์ด ชื่อแท็บ": pg.title(),
+            "แดชบอร์ด คำอธิบาย": pg.evaluate("[...document.querySelectorAll('meta[name=description],meta[property^=\"og:\"],meta[name^=\"twitter:\"]')].map(m=>m.content).join('\\n')"),
+            "แดชบอร์ด ป้ายในกราฟ": pg.evaluate("[...document.querySelectorAll('svg text')].map(t=>t.textContent).join('\\n')"),
+        }
+        assert len(texts["แดชบอร์ด จอ"]) > 2000, f"แดชบอร์ดมีข้อความแค่ {len(texts['แดชบอร์ด จอ'])} ตัว วาดไม่ครบ"
+        for where, s in texts.items():
+            checked += len(s)
+            for line in s.split("\n"):
+                if any(c in line for c in BAD): fails.append(f"{where}: {line.strip()[:80]}")
+        ctx.close()
         b.close()
 finally:
     if srv: srv.terminate()
+# กราฟแดชบอร์ดวาดบน canvas ป้ายแกนไม่อยู่ใน DOM จึงตรวจที่ข้อมูลที่ป้อนกราฟแทน (เคย "1–3 วัน")
+import glob, json
+for jf in sorted(glob.glob(os.path.join(ROOT, "dashboard", "data", "*.json"))):
+    js = json.dumps(json.load(open(jf, encoding="utf-8")), ensure_ascii=False); checked += len(js)
+    fails += [f"ข้อมูลกราฟ {os.path.basename(jf)}: {c}" for c in BAD if c in js]
 readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()   # หน้ารีโปบน GitHub คนก็เห็น
 checked += len(readme)
 fails += [f"README: {l.strip()[:80]}" for l in readme.split("\n") if any(c in l for c in BAD)]
