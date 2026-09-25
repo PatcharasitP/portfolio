@@ -2,10 +2,14 @@
 อ่านจากหน้าจริงทั้งสองภาษา: ข้อความบนจอ (innerText รวมเคสเต็มที่พับไว้), ชื่อแท็บ, คำอธิบายตอนแชร์ลิงก์
 ใช้: python3 tests/browser_separators.py              เปิดเซิร์ฟเวอร์ในเครื่องให้เอง
      PF_BASE=https://patcharasitp.github.io/portfolio/ python3 tests/browser_separators.py   ยิงเว็บจริง
-พิสูจน์ว่าแดงเป็น: ยิงเว็บจริงก่อนแก้ 24/09 ต้องตก (เว็บจริงตอนนั้นยังมี · กับ —)"""
+พิสูจน์ว่าแดงเป็น: ยิงเว็บจริงก่อนแก้ 24/09 ต้องตก (เว็บจริงตอนนั้นยังมี · กับ —)
+25/09/2026 เพิ่มตัวที่ CSS วาด (::before ::after) เพราะ innerText มองไม่เห็น ปุ่มพับเคสเต็มตอนกางวาด "–" ด้วยฟอนต์ตัวพิมพ์ดีด
+   ดูเป็นขีดยาวบนเว็บจริงมาตลอดโดยเทสนี้ผ่าน พิสูจน์: ยิงเว็บจริงก่อนแก้ต้องตกที่ ตัวที่ CSS วาด"""
 import os, subprocess, sys, time, socket
 from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# ตัวอักษรที่ CSS วาดเอง (content ของ ::before ::after) ไม่อยู่ใน innerText ต้องอ่านจาก computed style
+PSEUDO = "[...document.querySelectorAll('*')].flatMap(e=>['::before','::after'].map(p=>{const c=getComputedStyle(e,p).content;return c&&c!=='none'&&c!=='normal'?c:''})).filter(Boolean).join('\\n')"
 BAD = ("·", "—", "–")   # – ขีดสั้นก็ห้าม: ช่วงเวลาเขียนด้วยฟอนต์ตัวพิมพ์ดีด ขีดสั้นกว้างเต็มช่องดูเป็นขีดยาว (เห็นในภาพ 24/09)
 
 def free_port():
@@ -32,6 +36,7 @@ try:
                 "จอ": pg.evaluate("document.body.innerText"),
                 "ชื่อแท็บ": pg.title(),
                 "คำอธิบาย": pg.evaluate("[...document.querySelectorAll('meta[name=description],meta[property^=\"og:\"],meta[name^=\"twitter:\"]')].map(m=>m.content).join('\\n')"),
+                "ตัวที่ CSS วาด": pg.evaluate(PSEUDO),
             }
             assert len(texts["จอ"]) > 2000, f"หน้า {lang} มีข้อความแค่ {len(texts['จอ'])} ตัว วาดไม่ครบ ตรวจอะไรไม่ได้"
             for where, s in texts.items():
@@ -48,6 +53,7 @@ try:
             "แดชบอร์ด ชื่อแท็บ": pg.title(),
             "แดชบอร์ด คำอธิบาย": pg.evaluate("[...document.querySelectorAll('meta[name=description],meta[property^=\"og:\"],meta[name^=\"twitter:\"]')].map(m=>m.content).join('\\n')"),
             "แดชบอร์ด ป้ายในกราฟ": pg.evaluate("[...document.querySelectorAll('svg text')].map(t=>t.textContent).join('\\n')"),
+            "แดชบอร์ด ตัวที่ CSS วาด": pg.evaluate(PSEUDO),
         }
         assert len(texts["แดชบอร์ด จอ"]) > 2000, f"แดชบอร์ดมีข้อความแค่ {len(texts['แดชบอร์ด จอ'])} ตัว วาดไม่ครบ"
         for where, s in texts.items():

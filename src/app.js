@@ -145,7 +145,11 @@ function contact() {
       el("h2", { text: c.head }),
       el("p", { text: c.body }),
       el("div", { class: "contact-links" }, [
-        el("a", { class: "btn", href: mail }, `✉ ${C.meta.email}`),
+        // จอแคบที่อยู่อีเมลยาวตกเป็นสองบรรทัด (วัด 25/09/2026) ใส่ข้อความสองแบบแล้วให้ CSS เลือกตามความกว้างจอ
+        el("a", { class: "btn mail", href: mail, title: C.meta.email }, [
+          el("span", { class: "mail-full" }, `✉ ${C.meta.email}`),
+          el("span", { class: "mail-short" }, `✉ ${C.ui[lang].emailShort}`),
+        ]),
         el("a", { class: "btn alt", href: C.meta.github, target: "_blank", rel: "noopener" }, "GitHub"),
         el("a", { class: "btn alt", href: C.meta.resume, download: true }, C.ui[lang].downloadCv),
       ]),

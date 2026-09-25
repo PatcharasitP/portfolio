@@ -18,11 +18,13 @@ export const CONTENT = {
     th: { langBtn: "EN", themeLight: "โหมดสว่าง", themeDark: "โหมดมืด",
           viewProjects: "ดูผลงาน", downloadCv: "ดาวน์โหลด CV", contact: "ติดต่อ",
           visit: "เปิดเว็บจริง", code: "ซอร์สโค้ด", copied: "คัดลอกแล้ว",
-          readCase: "อ่านที่มาที่ไปแบบเต็ม", statusLive: "ใช้งานจริง", statusCode: "เปิดซอร์สโค้ด" },
+          readCase: "อ่านที่มาที่ไปแบบเต็ม", statusLive: "ใช้งานจริง", statusCode: "เปิดซอร์สโค้ด",
+          emailShort: "ส่งอีเมล" },
     en: { langBtn: "ไทย", themeLight: "Light mode", themeDark: "Dark mode",
           viewProjects: "View projects", downloadCv: "Download CV", contact: "Contact",
           visit: "Live site", code: "Source code", copied: "Copied",
-          readCase: "Read the full case", statusLive: "Live", statusCode: "Open source" },
+          readCase: "Read the full case", statusLive: "Live", statusCode: "Open source",
+          emailShort: "Email me" },
   },
 
   hero: {

@@ -12,13 +12,21 @@
 <meta property="og:image" content="https://patcharasitp.github.io/portfolio/assets/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E">
 <style>
+/* ฟอนต์ Sarabun โหลดจริงจากไฟล์ชุดเดียวกับหน้าแรก (25/09/2026 ดูคำอธิบายใน ../index.html) */
+@font-face{font-family:"PF Fallback";src:local("Leelawadee UI"),local("Tahoma"),local("Arial");
+  font-weight:400;size-adjust:97%;ascent-override:92%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"PF Fallback";src:local("Leelawadee UI Bold"),local("LeelawadeeUI-Bold"),local("Tahoma Bold"),local("Arial Bold");
+  font-weight:600 700;size-adjust:97%;ascent-override:92%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"Sarabun";src:url("../assets/fonts/Sarabun-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:fallback}
+@font-face{font-family:"Sarabun";src:url("../assets/fonts/Sarabun-SemiBold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:fallback}
+@font-face{font-family:"Sarabun";src:url("../assets/fonts/Sarabun-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:fallback}
 :root{
   --bg:#fbfbfa; --surface:#fff; --surface-2:#f4f4f2; --line:#e3e3df; --line-soft:#ececeb;
   --text:#1a1a18; --text-2:#4a4a46; --text-3:#6b6b64;
   --accent:#1d4ed8; --warn:#c2410c; --ok:#0f7b4f;
   --radius:14px; --maxw:1000px;
   --shadow:0 1px 2px rgba(20,20,18,.05), 0 8px 24px rgba(20,20,18,.05);
-  --font:"Sarabun","IBM Plex Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font:"Sarabun","PF Fallback",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
 }
 :root[data-theme="dark"], :root:not([data-theme="light"]) .dm{}

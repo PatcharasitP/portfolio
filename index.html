@@ -24,6 +24,19 @@
    · line-height เนื้อความ 1.75 (สูงกว่าค่าแนะนำสากล 1.6 เพราะภาษาไทยมีสระบน-ล่าง)
    · โหมดมืดไม่ใช้ดำสนิท/ขาวสนิท เพื่อลดอาการล้าตาและขอบเรืองของตัวอักษร
    · คู่สีทุกคู่ผ่านเกณฑ์ contrast 4.5:1 ของ WCAG 2.1 AA */
+/* ── ฟอนต์ Sarabun โหลดจากไฟล์ของเราเอง (25/09/2026) ──────────────────────────
+   เดิมประกาศชื่อ Sarabun ไว้แต่ไม่ได้โหลดไฟล์ คนเปิดบน Windows จึงเห็น Leelawadee UI มาตลอด
+   ส่วนเครื่องทดสอบเห็น Sarabun เพราะติดตั้งไว้เอง (วัดด้วย CDP getPlatformFontsForNode)
+   สูตรเดียวกับ FileKit ที่วัดแล้วบน production: ไฟล์ย่อยจากตัวอักษรจริง (tools/build-fonts.py)
+   font-display:fallback (รอ 100ms แล้วค่อยสลับได้ภายใน 3 วินาที) และฟอนต์สำรองมีหน้าตัวหนาแยก
+   ปรับขนาดให้กว้างใกล้ Sarabun ตอนสลับตัวอักษรจะแทบไม่ขยับ */
+@font-face{font-family:"PF Fallback";src:local("Leelawadee UI"),local("Tahoma"),local("Arial");
+  font-weight:400;size-adjust:97%;ascent-override:92%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"PF Fallback";src:local("Leelawadee UI Bold"),local("LeelawadeeUI-Bold"),local("Tahoma Bold"),local("Arial Bold");
+  font-weight:600 700;size-adjust:97%;ascent-override:92%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"Sarabun";src:url("assets/fonts/Sarabun-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:fallback}
+@font-face{font-family:"Sarabun";src:url("assets/fonts/Sarabun-SemiBold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:fallback}
+@font-face{font-family:"Sarabun";src:url("assets/fonts/Sarabun-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:fallback}
 :root{
   --bg:#fbfbfa; --surface:#ffffff; --surface-2:#f4f4f2;
   --line:#e3e3df; --line-soft:#ececeb;
@@ -33,7 +46,7 @@
   --radius:14px; --radius-sm:9px;
   --shadow:0 1px 2px rgba(20,20,18,.05), 0 8px 24px rgba(20,20,18,.05);
   --maxw:920px;
-  --font:"Sarabun","IBM Plex Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --font:"Sarabun","PF Fallback",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --mono:ui-monospace,"SFMono-Regular","Cascadia Code",Consolas,monospace;
 }
 :root[data-theme="dark"]{
@@ -171,6 +184,7 @@ a.chip:hover{color:var(--text); border-color:var(--text-3); text-decoration:none
 .proj-art .draw{stroke-dasharray:1; stroke-dashoffset:0}
 .proj.has-art .proj-tag,.proj.has-art h3,.proj.has-art .proj-meta{padding-right:176px}
 .stat b{font-variant-numeric:tabular-nums}
+:root[lang="th"] .proj-tag,:root[lang="th"] .skill-card h3{letter-spacing:.04em}   /* ไทยถ่างเกิน 0.04em คำแตก เดิม .08 กับ .06 */
 @media (max-width:720px){ .proj-art{display:none} .proj.has-art .proj-tag,.proj.has-art h3,.proj.has-art .proj-meta{padding-right:0} }
 @media (prefers-reduced-motion: no-preference){
   .proj-art .dot,.proj-art .file,.proj-art .spin{transform-box:fill-box; transform-origin:center}
@@ -199,7 +213,7 @@ a.chip:hover{color:var(--text); border-color:var(--text-3); text-decoration:none
 }
 .carl > summary::-webkit-details-marker{display:none}
 .carl > summary::before{content:"+"; font-family:var(--mono); color:var(--accent); font-size:15px}
-.carl[open] > summary::before{content:"–"}
+.carl[open] > summary::before{transform:rotate(45deg)}   /* เดิมเป็นขีดสั้น ฟอนต์ตัวพิมพ์ดีดวาดเต็มช่องดูเป็นขีดยาว (25/09/2026) */
 .carl > summary:hover{color:var(--text)}
 .carl dl{display:grid; grid-template-columns:112px 1fr; gap:9px 18px; margin:16px 0 0}
 .carl dt{font-size:12.5px; font-weight:700; color:var(--text-3); padding-top:2px}
@@ -230,6 +244,10 @@ a.chip:hover{color:var(--text); border-color:var(--text-3); text-decoration:none
 .contact-box h2{font-size:clamp(20px,3.4vw,26px); margin-bottom:10px}
 .contact-box p{color:var(--text-2); max-width:52ch; margin:0 auto 20px}
 .contact-links{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+/* ปุ่มอีเมลที่มีที่อยู่เต็มตกเป็นสองบรรทัดบนจอแคบ (วัด 25/09/2026: Sarabun พอดีบรรทัดเดียวตั้งแต่จอ 370px
+   ฟอนต์สำรองตั้งแต่ 362px) จอแคบกว่า 390px ใช้ข้อความสั้นแทน ที่อยู่เต็มยังอยู่ในลิงก์ mailto และ title */
+.btn .mail-short{display:none}
+@media (max-width:389px){ .btn .mail-full{display:none} .btn .mail-short{display:inline} }
 footer{padding:26px 0 40px; text-align:center; color:var(--text-3); font-size:12.5px}
 
 /* ── โผล่ขึ้นเบา ๆ ตอนเลื่อนถึง (ปิดอัตโนมัติถ้าผู้ใช้ตั้งค่าลดการเคลื่อนไหว) ── */

@@ -192,6 +192,12 @@ const specs = {
 const MOUNTS = { hist: "#c-hist", map: "#c-map", quad: "#c-quad", type: "#c-type", star: "#c-star", daily: "#c-daily" };
 
 async function drawAll() {
+  // กราฟวาดบน canvas ซึ่งไม่วาดใหม่เองเมื่อฟอนต์มาถึงทีหลัง ต้องรอ Sarabun ก่อน (25/09/2026 เริ่มโหลดฟอนต์จริง)
+  // รอไม่เกิน 3 วินาทีตามช่วงสลับของ font-display:fallback ช้ากว่านั้นวาดด้วยฟอนต์สำรองไปเลย
+  try {
+    await Promise.race([Promise.all(["400 12px Sarabun", "600 12px Sarabun"].map((f) => document.fonts.load(f))),
+                        new Promise((r) => setTimeout(r, 3000))]);
+  } catch (e) { /* ไม่มี FontFace API ก็วาดต่อได้ */ }
   const cfg = themeConfig();
   for (const [key, sel] of Object.entries(MOUNTS)) {
     const node = $(sel);
